@@ -60,50 +60,50 @@ The models were rigorously evaluated on the official Test Sets in a direct compa
 A brief comparison of the best fine-tuned BERT models with the NLTK and Spacy models is given below:
 
 **Italian Results**
-Dataset	Metric | NLTK (Punkt) |	spaCy (it_core_news) | Our Model    
+Dataset	Metric | NLTK (Punkt) |	spaCy (it_core_news) | Our Model        
 _ISDT_	    
-F1-Score	[0.9539]	[0.9866]	[0.9959]    
-Precision	[0.9640]	[0.9835]	[0.9938]    
-Recall	    [0.9440]	[0.9896]    [0.9979]    
-Accuracy	[0.9959]	[0.9988]	[0.9996]    
+F1-Score	|   [0.9539]	|   [0.9866]    |	[0.9959]    
+Precision	|   [0.9640]    |	[0.9835]    |	[0.9938]    
+Recall	    |   [0.9440]    |	[0.9896]    |    [0.9979]    
+Accuracy	|   [0.9959]    |	[0.9988]    |	[0.9996]    
 _MARKIT_	
-F1-Score	[0.9171]	[0.9838]	[1.0000]    
-Precision	[0.9799]	[0.9824]	[1.0000]    
-Recall	    [0.8618]	[0.9853]    [1.0000]    
-Accuracy	[0.9950]	[0.9990]	[1.0000]    
+F1-Score	|   [0.9171]    |	[0.9838]    |	[1.0000]    
+Precision	|   [0.9799]    |	[0.9824]    |	[1.0000]    
+Recall	    |   [0.8618]    |	[0.9853]    |    [1.0000]    
+Accuracy	|   [0.9950]    |	[0.9990]    |	[1.0000]    
 _PARTUT_	    
-F1-Score	[0.9934]	[0.9934]	[1.0000]    
-Precision	[1.0000]	[1.0000]	[1.0000]    
-Recall	    [0.9869]	[0.9869]    [1.0000]    
-Accuracy	[0.9995]	[0.9995]	[1.0000]    
+F1-Score    |	[0.9934]    |	[0.9934]    |	[1.0000]    
+Precision   |	[1.0000]    |	[1.0000]    |	[1.0000]    
+Recall  	|   [0.9869]    |	[0.9869]    |    [1.0000]    
+Accuracy	|   [0.9995]    |	[0.9995]    |	[1.0000]    
 _VIT_	    
-F1-Score	[0.9584]	[0.9189]	[0.9769]    
-Precision	[0.9795]	[0.8760]	[0.9627]    
-Recall	    [0.9381]	[0.9663]    [0.9916]    
-Accuracy	[0.9968]	[0.9933]	[0.9982]    
+F1-Score	|   [0.9584]    |	[0.9189]    |	[0.9769]    
+Precision	|   [0.9795]    |	[0.8760]    |	[0.9627]    
+Recall	    |   [0.9381]    |	[0.9663]    |    [0.9916]    
+Accuracy	|   [0.9968]    |	[0.9933]    |	[0.9982]    
 
 **English Results**
-Dataset	Metric | NLTK (Punkt) | spaCy (en_core_web) | Our Model 
+Dataset	Metric | NLTK (Punkt) | spaCy (en_core_web) | Our Model     
 _EWT_	
-F1-Score	[0.8028]	[0.8194]	[0.9282]    
-Precision	[0.9833]	[0.9528]	[0.9483]    
-Recall	    [0.6784]	[0.7188]	[0.9090]    
-Accuracy	[0.9774]	[0.9785]	[0.9904]    
+F1-Score    |   [0.8028]    |	[0.8194]    |	[0.9282]    
+Precision	|   [0.9833]    |	[0.9528]    |	[0.9483]    
+Recall	    |   [0.6784]    |	[0.7188]    |	[0.9090]    
+Accuracy	|   [0.9774]    |	[0.9785]    |	[0.9904]    
 _GUM_	    
-F1-Score	[0.9186]	[0.9229]	[0.9733]    
-Precision	[0.9711]	[0.9574]	[0.9753]    
-Recall	    [0.8716]	[0.8907]	[0.9713]     
-Accuracy	[0.9929]	[0.9931]	[0.9975]    
+F1-Score	|   [0.9186]    |	[0.9229]    |	[0.9733]    
+Precision	|   [0.9711]    |	[0.9574]    |	[0.9753]    
+Recall	    |   [0.8716]    |  	[0.8907]    |	[0.9713]     
+Accuracy	|   [0.9929]    |	[0.9931]    |	[0.9975]    
 _PARTUT_	    
-F1-Score	[0.9934]	[0.9869]	[0.9935]    
-Precision	[1.0000]	[0.9869]	[0.9935]    
-Recall	    [0.9869]	[0.9869]	[0.9935]    
-Accuracy	[0.9995]	[0.9989]	[0.9995]    
+F1-Score	|   [0.9934]    |	[0.9869]    |	[0.9935]    
+Precision	|   [1.0000]    |	[0.9869]    |	[0.9935]    
+Recall	    |   [0.9869]    |	[0.9869]    |	[0.9935]    
+Accuracy	|   [0.9995]    |	[0.9989]    |	[0.9995]    
 _PUD_	
-F1-Score	[0.9910]	[0.9965]	[0.9891]    
-Precision	[0.9900]	[0.9950]	[0.9813]    
-Recall	    [0.9920]	[0.9980]    [0.9970]    
-Accuracy	[0.9992]	[0.9997]	[0.9991]    
+F1-Score	|   [0.9910]    |	[0.9965]    |	[0.9891]    
+Precision	|   [0.9900]    |	[0.9950]    |	[0.9813]    
+Recall	    |   [0.9920]    |	[0.9980]    |    [0.9970]    
+Accuracy	|   [0.9992]    |	[0.9997]    |	[0.9991]    
 
 ## 💻 4. Running the Code (CLI Commands)
 Here are the commands to reproduce the different phases of the project from your terminal. 
