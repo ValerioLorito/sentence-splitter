@@ -39,20 +39,20 @@ During the training and validation phases, multiple experiments were conducted. 
 **🇮🇹 Italian Model**
 This model was trained to handle the Italian language, which generally features a cleaner structure, thus requiring a lighter preventive Data Augmentation. The best training setting results the following:
 
-Base Model: dbmdz/bert-base-italian-xxl-cased
-Learning Rate: [INSERT LR]
-Epochs: [INSERT EPOCHS]
-Weight Decay: [INSERT WD]
-Dirty Prob (Train): [INSERT PROBABILITY]
+Base Model: dbmdz/bert-base-italian-xxl-cased  
+Learning Rate: [INSERT LR]  
+Epochs: [INSERT EPOCHS]  
+Weight Decay: [INSERT WD]  
+Dirty Prob (Train): [INSERT PROBABILITY]  
 
 **🇬🇧 English Model**
-This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.
+This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.  
 
-Base Model: bert-base-cased
-Learning Rate: [INSERT LR]
-Epochs: [INSERT EPOCHS]
-Weight Decay: [INSERT WD]
-Dirty Prob (Train): [INSERT PROBABILITY]
+Base Model: bert-base-cased  
+Learning Rate: [INSERT LR]  
+Epochs: [INSERT EPOCHS]  
+Weight Decay: [INSERT WD]  
+Dirty Prob (Train): [INSERT PROBABILITY]  
 
 ## 📊 3. Evaluation and Results (Test Sets)
 The models were rigorously evaluated on the official Test Sets in a direct comparison against NLTK (Punkt) and spaCy. The prediction extraction process was perfectly fair: BERT worked on context-aware chunks, while NLTK and spaCy processed the raw text to prevent altering their internal space-based rules.
@@ -60,47 +60,47 @@ The models were rigorously evaluated on the official Test Sets in a direct compa
 A brief comparison of the best fine-tuned BERT models with the NLTK and Spacy models is given below:
 
 **Italian Results**
-Dataset	Metric | NLTK (Punkt) |	spaCy (it_core_news) | Our Model 
-_ISDT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_MARKIT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_PARTUT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_VIT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+Dataset	Metric | NLTK (Punkt) |	spaCy (it_core_news) | Our Model  
+_ISDT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_MARKIT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_PARTUT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_VIT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
 
 **English Results**
-Dataset	Metric | NLTK (Punkt) | spaCy (en_core_web) | Our Model
-_EWT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]	[INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_GUM_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]	[INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_PARTUT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]	[INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
-_PUD_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+Dataset	Metric | NLTK (Punkt) | spaCy (en_core_web) | Our Model  
+_EWT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_GUM_	  
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_PARTUT_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]  
+_PUD_	 
+F1-Score	[INSERT]	[INSERT]	[INSERT]  
+Precision	[INSERT]	[INSERT]	[INSERT]  
+Recall	  [INSERT]	[INSERT]  [INSERT]  
+Accuracy	[INSERT]	[INSERT]	[INSERT]   
