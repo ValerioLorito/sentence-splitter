@@ -66,16 +66,19 @@ F1-Score	[INSERT]	[INSERT]	[INSERT]
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _MARKIT_	 
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _PARTUT_	 
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _VIT_	 
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
@@ -89,16 +92,19 @@ F1-Score	[INSERT]	[INSERT]	[INSERT]
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _GUM_	  
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _PARTUT_	 
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
 Recall	  [INSERT]	[INSERT]  [INSERT]  
 Accuracy	[INSERT]	[INSERT]	[INSERT]  
+
 _PUD_	 
 F1-Score	[INSERT]	[INSERT]	[INSERT]  
 Precision	[INSERT]	[INSERT]	[INSERT]  
