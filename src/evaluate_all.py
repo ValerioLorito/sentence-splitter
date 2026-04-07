@@ -131,18 +131,33 @@ def evaluate_all(file_path, model, tokenizer, device, lang, spacy_nlp):
 
 def main():
     parser = argparse.ArgumentParser(description="Final Evaluation: BERT vs NLTK vs spaCy")
-    parser.add_argument("--run", type=str, required=True, help="Name of the run to evaluate")
+    parser.add_argument("--run", type=str, required=True, help="Name of the local run folder OR Hugging Face Repo ID (e.g. user/repo)")
     parser.add_argument("--lang", type=str, choices=['italian', 'english'], required=True, help="Language of the dataset")
     args = parser.parse_args()
 
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
     BASE_DIR = os.path.dirname(SCRIPT_DIR) 
-    RUN_DIR = os.path.join(BASE_DIR, 'runs', args.run)
     DATA_DIR = os.path.join(BASE_DIR, 'data')
 
-    if not os.path.exists(RUN_DIR):
-        print(f"❌ ERROR: Run not found at: {RUN_DIR}")
-        return
+    # ---------------------------------------------------------
+    # SMART MODEL PATH DETECTION (Local vs Cloud)
+    # ---------------------------------------------------------
+    is_hf_model = "/" in args.run
+
+    if is_hf_model:
+        print(f"☁️ Hugging Face Cloud Model detected: {args.run}")
+        model_path = args.run
+        # Create a safe folder name for saving results locally
+        safe_repo_name = args.run.replace("/", "_")
+        RUN_DIR = os.path.join(BASE_DIR, 'runs', f'eval_{safe_repo_name}')
+        os.makedirs(RUN_DIR, exist_ok=True)
+    else:
+        print(f"💻 Local Run detected: {args.run}")
+        RUN_DIR = os.path.join(BASE_DIR, 'runs', args.run)
+        if not os.path.exists(RUN_DIR):
+            print(f"❌ ERROR: Local run not found at: {RUN_DIR}")
+            return
+        model_path = os.path.join(RUN_DIR, 'final_model')
 
     # Create the methodologically sound test_results directory
     TEST_RESULTS_DIR = os.path.join(RUN_DIR, 'test_results')
@@ -153,11 +168,9 @@ def main():
 
     # DYNAMIC LANGUAGE SETUP
     if args.lang == 'italian':
-        model_name = "dbmdz/bert-base-italian-xxl-cased"
         target_datasets = ["UD_ITALIAN-ISDT", "UD_ITALIAN-MARKIT", "UD_ITALIAN-PARTUT", "UD_ITALIAN-VIT"]
         spacy_model_name = "it_core_news_sm"
     elif args.lang == 'english':
-        model_name = "bert-base-cased"
         target_datasets = ["UD_English-EWT", "UD_English-GUM", "UD_English-ParTUT", "UD_English-PUD"]
         spacy_model_name = "en_core_web_sm"
 
@@ -170,11 +183,11 @@ def main():
         print(f"python -m spacy download {spacy_model_name}\n")
         return
 
-    model_path = os.path.join(RUN_DIR, 'final_model')
-    print(f"🤖 Loading BERT model from: {args.run}")
+    print(f"🤖 Loading Tokenizer and BERT model from: {model_path}")
     print(f"🌍 Language set to: {args.lang.upper()}")
     
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    # Loads from Hugging Face OR Local path dynamically!
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
     model = AutoModelForTokenClassification.from_pretrained(model_path)
     
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

@@ -43,7 +43,7 @@ Base Model: dbmdz/bert-base-italian-xxl-cased
 Learning Rate: [2e-05]
 Epochs: [10]
 Weight Decay: [0.1]
-Dirty Prob (Train): [0.01]
+Dirty Prob (Train): [0.1]
 
 **🇬🇧 English Model**
 This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.  
@@ -56,10 +56,6 @@ Dirty Prob (Train): [INSERT PROBABILITY]
 
 ## 📊 3. Evaluation and Results (Test Sets)
 The models were rigorously evaluated on the official Test Sets in a direct comparison against NLTK (Punkt) and spaCy. The prediction extraction process was perfectly fair: BERT worked on context-aware chunks, while NLTK and spaCy processed the raw text to prevent altering their internal space-based rules.
-
-The best models belong to the following runs:
-- Best Italian Model: 'run_italian_20260407_160912'
-- Best English Model: ''
 
 A brief comparison of the best fine-tuned BERT models with the NLTK and Spacy models is given below:
 
@@ -118,19 +114,34 @@ To extract dynamic metrics and `<EOS>` statistics from the datasets:
 python dataset_analysis/analyze_datasets.py
 ```
 
-**Model Training**
-To train a new BERT model. Replace 'LANGUAGE' with either 'italian' or 'english':
+**Final Test Set Evaluation (With Pre-trained Models)**
+If you do not want to train the models from scratch, you can use the best performing models uploaded to the Hugging Face Hub. The evaluation script will automatically download the weights and run the comparison against NLTK and spaCy.
+
+To test the **Italian** model:
+```bash
+python src/evaluate_all.py --run valeriolorito/bert-italian-sentence-splitter --lang italian
+```
+
+To test the **English** model:
+```bash
+python src/evaluate_all.py --run valeriolorito/bert-english-sentence-splitter --lang english
+```
+
+If you want to train, evaluate and see the test results, follow the guidelines below:
+
+**Model Training(optional)**
+If you want to train a new BERT model from scratch. Replace 'LANGUAGE' with either 'italian' or 'english':
 ```bash
 python src/train.py --lang LANGUAGE
 ```
 
-**Dev Set Evaluation & Error Analysis**
+**Dev Set Evaluation & Error Analysis(optional)**
 To evaluate a specific run on the Dev Sets, generating comparison confusion matrices and detailed error logs. Replace 'RUN_NAME' with the exact name of your run folder (e.g., 'run_english_2026'...) and 'LANGUAGE' with 'italian' or 'english':
 ```bash
 python src/error_analysis.py --run RUN_NAME --lang LANGUAGE
 ```
 
-**Final Test Set Evaluation**
+**Final Test Set Evaluation(optional)**
 To evaluate a trained model on the official Test Sets, generating the final JSON metrics and the comparison bar charts:
 ```bash
 python src/evaluate_all.py --run RUN_NAME --lang LANGUAGE
