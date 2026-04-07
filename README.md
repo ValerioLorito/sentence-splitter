@@ -40,10 +40,10 @@ During the training and validation phases, multiple experiments were conducted. 
 This model was trained to handle the Italian language, which generally features a cleaner structure, thus requiring a lighter preventive Data Augmentation. The best training setting results the following:
 
 Base Model: dbmdz/bert-base-italian-xxl-cased
-Learning Rate: [INSERT LR]
-Epochs: [INSERT EPOCHS]
-Weight Decay: [INSERT WD]
-Dirty Prob (Train): [INSERT PROBABILITY]
+Learning Rate: [2e-05]
+Epochs: [10]
+Weight Decay: [0.1]
+Dirty Prob (Train): [0.01]
 
 **🇬🇧 English Model**
 This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.
@@ -57,30 +57,34 @@ Dirty Prob (Train): [INSERT PROBABILITY]
 ## 📊 3. Evaluation and Results (Test Sets)
 The models were rigorously evaluated on the official Test Sets in a direct comparison against NLTK (Punkt) and spaCy. The prediction extraction process was perfectly fair: BERT worked on context-aware chunks, while NLTK and spaCy processed the raw text to prevent altering their internal space-based rules.
 
+The best models belong to the following runs:
+- Best Italian Model: 'run_italian_20260407_160912'
+- Best English Model: ''
+
 A brief comparison of the best fine-tuned BERT models with the NLTK and Spacy models is given below:
 
 **Italian Results**
 Dataset	Metric | NLTK (Punkt) |	spaCy (it_core_news) | Our Model 
 _ISDT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+F1-Score	[0.9539]	[0.9866]	[0.9959]
+Precision	[0.9640]	[0.9835]	[0.9938]
+Recall	    [0.9440]	[0.9896]    [0.9979]
+Accuracy	[0.9959]	[0.9988]	[0.9996]
 _MARKIT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+F1-Score	[0.9171]	[0.9838]	[1.0000]
+Precision	[0.9799]	[0.9824]	[1.0000]
+Recall	    [0.8618]	[0.9853]    [1.0000]
+Accuracy	[0.9950]	[0.9990]	[1.0000]
 _PARTUT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+F1-Score	[0.9934]	[0.9934]	[1.0000]
+Precision	[1.0000]	[1.0000]	[1.0000]
+Recall	    [0.9869]	[0.9869]    [1.0000]
+Accuracy	[0.9995]	[0.9995]	[1.0000]
 _VIT_	
-F1-Score	[INSERT]	[INSERT]	[INSERT]
-Precision	[INSERT]	[INSERT]	[INSERT]
-Recall	    [INSERT]	[INSERT]    [INSERT]
-Accuracy	[INSERT]	[INSERT]	[INSERT]
+F1-Score	[0.9584]	[0.9189]	[0.9769]
+Precision	[0.9795]	[0.8760]	[0.9627]
+Recall	    [0.9381]	[0.9663]    [0.9916]
+Accuracy	[0.9968]	[0.9933]	[0.9982]
 
 **English Results**
 Dataset	Metric | NLTK (Punkt) | spaCy (en_core_web) | Our Model
@@ -104,3 +108,32 @@ F1-Score	[INSERT]	[INSERT]	[INSERT]
 Precision	[INSERT]	[INSERT]	[INSERT]
 Recall	    [INSERT]	[INSERT]    [INSERT]
 Accuracy	[INSERT]	[INSERT]	[INSERT]
+
+## 💻 4. Running the Code (CLI Commands)
+Here are the commands to reproduce the different phases of the project from your terminal. 
+
+**Dataset Analysis**
+To extract dynamic metrics and `<EOS>` statistics from the datasets:
+```bash
+python dataset_analysis/analyze_datasets.py
+```
+
+**Model Training**
+To train a new BERT model. Replace 'LANGUAGE' with either 'italian' or 'english':
+```bash
+python src/train.py --lang LANGUAGE
+```
+
+**Dev Set Evaluation & Error Analysis**
+To evaluate a specific run on the Dev Sets, generating comparison confusion matrices and detailed error logs. Replace 'RUN_NAME' with the exact name of your run folder (e.g., 'run_english_2026'...) and 'LANGUAGE' with 'italian' or 'english':
+```bash
+python src/error_analysis.py --run RUN_NAME --lang LANGUAGE
+```
+
+**Final Test Set Evaluation**
+To evaluate a trained model on the official Test Sets, generating the final JSON metrics and the comparison bar charts:
+```bash
+python src/evaluate_all.py --run RUN_NAME --lang LANGUAGE
+```
+
+Enjoy!
