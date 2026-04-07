@@ -46,13 +46,13 @@ Weight Decay: [0.1]
 Dirty Prob (Train): [0.01]
 
 **🇬🇧 English Model**
-This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.
+This model was trained for English, applying a more aggressive Data Augmentation to counter extremely chaotic datasets (e.g., EWT and GUM) full of quotes, brackets, and unpunctuated headers.  
 
-Base Model: bert-base-cased
-Learning Rate: [INSERT LR]
-Epochs: [INSERT EPOCHS]
-Weight Decay: [INSERT WD]
-Dirty Prob (Train): [INSERT PROBABILITY]
+Base Model: bert-base-cased  
+Learning Rate: [INSERT LR]  
+Epochs: [INSERT EPOCHS]  
+Weight Decay: [INSERT WD]  
+Dirty Prob (Train): [INSERT PROBABILITY]  
 
 ## 📊 3. Evaluation and Results (Test Sets)
 The models were rigorously evaluated on the official Test Sets in a direct comparison against NLTK (Punkt) and spaCy. The prediction extraction process was perfectly fair: BERT worked on context-aware chunks, while NLTK and spaCy processed the raw text to prevent altering their internal space-based rules.
