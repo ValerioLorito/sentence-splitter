@@ -45,9 +45,9 @@ def main():
     # SHARED HYPERPARAMETERS CONFIGURATION
     # =========================================================
     NUM_EPOCHS = 10
-    LEARNING_RATE = 1e-5
+    LEARNING_RATE = 3e-5
     WEIGHT_DECAY = 0.01
-    WARMUP_RATIO = 0.1
+    WARMUP_RATIO = 0
     BATCH_SIZE = 16
     # =========================================================
 
@@ -73,7 +73,7 @@ def main():
             "UD_ITALIAN-PARTUT",
             "UD_ITALIAN-VIT"  
         ]
-        TRAIN_DIRTY_PROB = 0.1 
+        TRAIN_DIRTY_PROB = 0.15 
         
     elif args.lang == 'english':
         model_name = "bert-base-cased"
@@ -83,7 +83,7 @@ def main():
             "UD_English-ParTUT",
             "UD_English-PUD"
         ]
-        TRAIN_DIRTY_PROB = 0.15 
+        TRAIN_DIRTY_PROB = 0.2
 
     print(f"🌍 Starting Training for language: {args.lang.upper()}")
     print(f"🤖 Base model: {model_name}")
@@ -145,7 +145,7 @@ def main():
         weight_decay=WEIGHT_DECAY,
         warmup_ratio=WARMUP_RATIO,
         load_best_model_at_end=True,    
-        metric_for_best_model="f1",     
+        metric_for_best_model="f1",   
     )
 
     trainer = Trainer(

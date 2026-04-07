@@ -2,9 +2,12 @@ import argparse
 import os
 import glob
 import re
+import json
 import torch
 import nltk
 import spacy
+import numpy as np
+import matplotlib.pyplot as plt
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 from sklearn.metrics import precision_recall_fscore_support, accuracy_score
 
@@ -13,6 +16,21 @@ from data_loader import load_prepare_and_augment_data
 def get_clean_len(text):
     """Returns the number of characters excluding all spaces and newlines."""
     return len(re.sub(r'\s+', '', text))
+
+def get_metrics_dict(true_labels, preds):
+    """Calculates metrics and returns them as a dictionary for JSON dumping."""
+    p, r, f1, _ = precision_recall_fscore_support(true_labels, preds, average='binary', zero_division=0)
+    acc = accuracy_score(true_labels, preds)
+    return {
+        "f1_score": round(f1, 4),
+        "precision": round(p, 4),
+        "recall": round(r, 4),
+        "accuracy": round(acc, 4)
+    }
+
+def print_formatted_metrics(metrics_dict, model_name):
+    """Prints metrics in a formatted string."""
+    print(f"  [{model_name:<16}] -> F1: {metrics_dict['f1_score']:.4f} | Prec: {metrics_dict['precision']:.4f} | Rec: {metrics_dict['recall']:.4f} | Acc: {metrics_dict['accuracy']:.4f}")
 
 def evaluate_all(file_path, model, tokenizer, device, lang, spacy_nlp):
     # Read the original raw text to give NLTK and spaCy a fair, perfectly formatted input
@@ -111,11 +129,6 @@ def evaluate_all(file_path, model, tokenizer, device, lang, spacy_nlp):
 
     return all_true, bert_preds, nltk_preds, spacy_preds
 
-def print_metrics(true_labels, preds, model_name):
-    p, r, f1, _ = precision_recall_fscore_support(true_labels, preds, average='binary', zero_division=0)
-    acc = accuracy_score(true_labels, preds)
-    print(f"  [{model_name}] -> F1: {f1:.4f} | Prec: {p:.4f} | Rec: {r:.4f} | Acc: {acc:.4f}")
-
 def main():
     parser = argparse.ArgumentParser(description="Final Evaluation: BERT vs NLTK vs spaCy")
     parser.add_argument("--run", type=str, required=True, help="Name of the run to evaluate")
@@ -130,6 +143,10 @@ def main():
     if not os.path.exists(RUN_DIR):
         print(f"❌ ERROR: Run not found at: {RUN_DIR}")
         return
+
+    # Create the methodologically sound test_results directory
+    TEST_RESULTS_DIR = os.path.join(RUN_DIR, 'test_results')
+    os.makedirs(TEST_RESULTS_DIR, exist_ok=True)
 
     nltk.download('punkt', quiet=True)
     nltk.download('punkt_tab', quiet=True)
@@ -168,6 +185,16 @@ def main():
     print(f" 🏆 ULTIMATE SHOWDOWN: BERT vs NLTK vs spaCy ON TEST SETS ({args.lang.upper()})")
     print("="*75)
 
+    # Data structures for JSON and Plotting
+    final_json_data = {
+        "language": args.lang,
+        "run_name": args.run,
+        "datasets_metrics": {}
+    }
+    
+    dataset_names_for_plot = []
+    f1_scores_plot = {'NLTK': [], 'spaCy': [], 'BERT': []}
+
     for ds_name in target_datasets:
         test_file_pattern = os.path.join(DATA_DIR, ds_name, "*-test.sent_split")
         test_files = glob.glob(test_file_pattern)
@@ -176,20 +203,80 @@ def main():
             print(f"\n⚠️ Skipped {ds_name}: Test file not found.")
             continue
             
-        # We iterate over all found test files for safety
-        for test_file in test_files:
-            true_lbls, bert_preds, nltk_preds, spacy_preds = evaluate_all(
-                test_file, model, tokenizer, device, args.lang, spacy_nlp
-            )
+        test_file = test_files[0]
+        
+        true_lbls, bert_preds, nltk_preds, spacy_preds = evaluate_all(
+            test_file, model, tokenizer, device, args.lang, spacy_nlp
+        )
+        
+        if true_lbls is None:
+            continue
             
-            if true_lbls is None:
-                continue
-                
-            print(f"\n📊 {os.path.basename(test_file).upper()}")
-            print("-" * 75)
-            print_metrics(true_lbls, nltk_preds, "NLTK (Punkt) ")
-            print_metrics(true_lbls, spacy_preds, f"spaCy ({spacy_model_name[:2]})")
-            print_metrics(true_lbls, bert_preds, "BERT Model   ")
+        print(f"\n📊 {os.path.basename(test_file).upper()}")
+        print("-" * 75)
+        
+        # Calculate metrics
+        nltk_metrics = get_metrics_dict(true_lbls, nltk_preds)
+        spacy_metrics = get_metrics_dict(true_lbls, spacy_preds)
+        bert_metrics = get_metrics_dict(true_lbls, bert_preds)
+        
+        # Print metrics
+        print_formatted_metrics(nltk_metrics, "NLTK (Punkt)")
+        print_formatted_metrics(spacy_metrics, f"spaCy ({spacy_model_name[:2]})")
+        print_formatted_metrics(bert_metrics, "BERT Model")
+        
+        # Store in JSON dictionary
+        final_json_data["datasets_metrics"][ds_name] = {
+            "NLTK": nltk_metrics,
+            "spaCy": spacy_metrics,
+            "BERT": bert_metrics
+        }
+        
+        # Store for plotting
+        short_ds_name = ds_name.split('-')[-1] # Extracts ISDT, VIT, EWT, etc.
+        dataset_names_for_plot.append(short_ds_name)
+        f1_scores_plot['NLTK'].append(nltk_metrics["f1_score"])
+        f1_scores_plot['spaCy'].append(spacy_metrics["f1_score"])
+        f1_scores_plot['BERT'].append(bert_metrics["f1_score"])
+
+    # ---------------------------------------------------------
+    # 1. SAVE JSON RESULTS
+    # ---------------------------------------------------------
+    json_path = os.path.join(TEST_RESULTS_DIR, 'test_metrics.json')
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump(final_json_data, f, indent=4)
+    print(f"\n📄 Test metrics successfully saved in JSON format: {json_path}")
+
+    # ---------------------------------------------------------
+    # 2. GENERATE F1-SCORE BAR CHART FOR TEST SETS
+    # ---------------------------------------------------------
+    if dataset_names_for_plot:
+        print(f"🖼️  Generating Final Test F1-Score Bar Chart...")
+        x = np.arange(len(dataset_names_for_plot))  
+        width = 0.25  
+
+        fig_bar, ax_bar = plt.subplots(figsize=(12, 6))
+        
+        rects1 = ax_bar.bar(x - width, f1_scores_plot['NLTK'], width, label='NLTK (Punkt)', color='#a8d0e6')
+        rects2 = ax_bar.bar(x, f1_scores_plot['spaCy'], width, label=f'spaCy', color='#f8e9a1')
+        rects3 = ax_bar.bar(x + width, f1_scores_plot['BERT'], width, label='BERT (Our Model)', color='#f76c6c')
+
+        ax_bar.set_ylabel('F1-Score', fontsize=12)
+        ax_bar.set_title(f'FINAL TEST EVALUATION: F1-Score Comparison ({args.lang.upper()})', fontsize=14, pad=15)
+        ax_bar.set_xticks(x)
+        ax_bar.set_xticklabels(dataset_names_for_plot, fontsize=11)
+        
+        ax_bar.legend(loc='lower right')
+        ax_bar.set_ylim([0.0, 1.1]) 
+
+        ax_bar.bar_label(rects1, padding=3, fmt='%.3f', fontsize=9)
+        ax_bar.bar_label(rects2, padding=3, fmt='%.3f', fontsize=9)
+        ax_bar.bar_label(rects3, padding=3, fmt='%.3f', fontsize=9, weight='bold')
+
+        fig_bar.tight_layout()
+        bar_img_path = os.path.join(TEST_RESULTS_DIR, 'f1_test_comparison_barchart.png')
+        fig_bar.savefig(bar_img_path, dpi=300, bbox_inches='tight')
+        print(f"✅ Final Test F1-Score Bar Chart saved in: {bar_img_path}")
 
 if __name__ == "__main__":
     main()

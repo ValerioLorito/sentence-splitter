@@ -7,7 +7,12 @@ import nltk
 import spacy
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import (
+    confusion_matrix, 
+    ConfusionMatrixDisplay,
+    precision_recall_fscore_support, 
+    accuracy_score
+)
 from transformers import AutoTokenizer, AutoModelForTokenClassification
 
 from data_loader import load_prepare_and_augment_data
@@ -118,6 +123,13 @@ def extract_errors(true_lbls, preds, words, ds_name):
                 fn.append(context)
     return fp, fn
 
+def get_and_format_metrics(true_labels, preds, model_name):
+    """Calculates metrics and returns both the formatted string and the raw F1-score."""
+    p, r, f1, _ = precision_recall_fscore_support(true_labels, preds, average='binary', zero_division=0)
+    acc = accuracy_score(true_labels, preds)
+    formatted_str = f"  [{model_name:<16}] -> F1: {f1:.4f} | Prec: {p:.4f} | Rec: {r:.4f} | Acc: {acc:.4f}"
+    return formatted_str, f1
+
 def main():
     parser = argparse.ArgumentParser(description="Error Analysis: BERT vs Baselines")
     parser.add_argument('--run', type=str, required=True, help='Name of the run directory')
@@ -174,7 +186,19 @@ def main():
     nltk_fp, nltk_fn = [], []
     spacy_fp, spacy_fn = [], []
 
-    print("\n🔍 Starting global prediction analysis on all DEV sets...")
+    # Variables for plotting and reporting
+    dataset_f1_scores = {'NLTK': [], 'spaCy': [], 'BERT': []}
+    dataset_names = []
+    report_lines = []
+
+    header = f" 🔍 DEV SET ANALYSIS & COMPARISON ({args.lang.upper()})"
+    print("\n" + "="*75)
+    print(header)
+    print("="*75)
+    
+    report_lines.append("="*75)
+    report_lines.append(header)
+    report_lines.append("="*75)
 
     # ---------------------------------------------------------
     # ITERATING OVER ALL DATASETS
@@ -184,11 +208,11 @@ def main():
         dev_files = glob.glob(dev_file_pattern)
         
         if not dev_files:
-            print(f"  ⚠️ Skipped {ds_name}: Dev file not found.")
+            print(f"\n  ⚠️ Skipped {ds_name}: Dev file not found.")
             continue
             
         dev_file = dev_files[0]
-        print(f"  -> Extracting and predicting chunks from {ds_name}...")
+        dataset_names.append(ds_name)
         
         t_lbls, words, b_preds, n_preds, s_preds = get_predictions_for_file(
             dev_file, model, tokenizer, device, args.lang, spacy_nlp
@@ -196,6 +220,24 @@ def main():
         
         if t_lbls is None:
             continue
+            
+        # --- PER-DATASET METRICS EXTRACTION ---
+        title = f"\n📊 {ds_name} (DEV SET)"
+        separator = "-" * 75
+        print(title); print(separator)
+        report_lines.append(title); report_lines.append(separator)
+
+        nltk_str, nltk_f1 = get_and_format_metrics(t_lbls, n_preds, "NLTK (Punkt)")
+        spacy_str, spacy_f1 = get_and_format_metrics(t_lbls, s_preds, f"spaCy ({spacy_model_name[:2]})")
+        bert_str, bert_f1 = get_and_format_metrics(t_lbls, b_preds, "BERT Model")
+
+        print(nltk_str); report_lines.append(nltk_str)
+        print(spacy_str); report_lines.append(spacy_str)
+        print(bert_str); report_lines.append(bert_str)
+
+        dataset_f1_scores['NLTK'].append(nltk_f1)
+        dataset_f1_scores['spaCy'].append(spacy_f1)
+        dataset_f1_scores['BERT'].append(bert_f1)
             
         global_true.extend(t_lbls)
         global_bert.extend(b_preds)
@@ -212,9 +254,51 @@ def main():
         spacy_fp.extend(sfp); spacy_fn.extend(sfn)
 
     # ---------------------------------------------------------
-    # CONFUSION MATRICES PLOT (1x3 Subplots)
+    # 1. SAVE METRICS TEXT REPORT
     # ---------------------------------------------------------
-    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    metrics_report_path = os.path.join(RUN_DIR, 'dev_metrics_report.txt')
+    with open(metrics_report_path, 'w', encoding='utf-8') as f:
+        f.write("\n".join(report_lines))
+    print(f"\n✅ Metrics report successfully saved in: {metrics_report_path}")
+
+    # ---------------------------------------------------------
+    # 2. GENERATE F1-SCORE BAR CHART
+    # ---------------------------------------------------------
+    print(f"🖼️  Generating F1-Score Bar Chart...")
+    x = np.arange(len(dataset_names))  
+    width = 0.25  
+
+    fig_bar, ax_bar = plt.subplots(figsize=(12, 6))
+    
+    rects1 = ax_bar.bar(x - width, dataset_f1_scores['NLTK'], width, label='NLTK (Punkt)', color='#a8d0e6')
+    rects2 = ax_bar.bar(x, dataset_f1_scores['spaCy'], width, label=f'spaCy', color='#f8e9a1')
+    rects3 = ax_bar.bar(x + width, dataset_f1_scores['BERT'], width, label='BERT (Our Model)', color='#f76c6c')
+
+    ax_bar.set_ylabel('F1-Score', fontsize=12)
+    ax_bar.set_title(f'F1-Score Comparison across {args.lang.upper()} DEV SETS', fontsize=14, pad=15)
+    ax_bar.set_xticks(x)
+    
+    # Puliamo i nomi dei dataset per il grafico (es. da "UD_ITALIAN-ISDT" a "ISDT")
+    clean_names = [name.split('-')[-1] for name in dataset_names]
+    ax_bar.set_xticklabels(clean_names, fontsize=11)
+    
+    ax_bar.legend(loc='lower right')
+    ax_bar.set_ylim([0.0, 1.1]) 
+
+    ax_bar.bar_label(rects1, padding=3, fmt='%.3f', fontsize=9)
+    ax_bar.bar_label(rects2, padding=3, fmt='%.3f', fontsize=9)
+    ax_bar.bar_label(rects3, padding=3, fmt='%.3f', fontsize=9, weight='bold')
+
+    fig_bar.tight_layout()
+    bar_img_path = os.path.join(RUN_DIR, 'f1_comparison_barchart.png')
+    fig_bar.savefig(bar_img_path, dpi=300, bbox_inches='tight')
+    print(f"✅ F1-Score Bar Chart saved in: {bar_img_path}")
+
+    # ---------------------------------------------------------
+    # 3. CONFUSION MATRICES PLOT (1x3 Subplots)
+    # ---------------------------------------------------------
+    print(f"🖼️  Generating Global Confusion Matrices...")
+    fig_cm, axes = plt.subplots(1, 3, figsize=(20, 6))
     
     models_data = [
         ("NLTK (Punkt)", global_nltk),
@@ -231,14 +315,14 @@ def main():
         ax.set_ylabel("True Label", fontsize=12)
 
     plt.suptitle(f"Global Confusion Matrices - {args.lang.upper()} DEV SETS", fontsize=18, y=1.05)
-    plt.tight_layout()
+    fig_cm.tight_layout()
     
     output_img_path = os.path.join(RUN_DIR, 'confusion_matrix_comparison.png')
-    plt.savefig(output_img_path, dpi=300, bbox_inches='tight')
-    print(f"\n🖼️  Comparative Confusion Matrices saved in: {output_img_path}")
+    fig_cm.savefig(output_img_path, dpi=300, bbox_inches='tight')
+    print(f"✅ Comparative Confusion Matrices saved in: {output_img_path}")
 
     # ---------------------------------------------------------
-    # ERROR LOG SAVING
+    # 4. ERROR LOG SAVING
     # ---------------------------------------------------------
     errors_log_path = os.path.join(RUN_DIR, 'error_analysis_log.txt')
     with open(errors_log_path, 'w', encoding='utf-8') as f:
@@ -268,8 +352,8 @@ def main():
         f.write(f"\n🟡 FALSE NEGATIVES:\n")
         for text in spacy_fn: f.write(f"- {text}\n")
 
-    print(f"📄 Comparative Error analysis log saved in: {errors_log_path}")
-    print(f"📊 Total tokens accurately analyzed: {len(global_true)}")
+    print(f"✅ Comparative Error context log saved in: {errors_log_path}")
+    print(f"📊 Total tokens accurately analyzed across all DEV sets: {len(global_true)}")
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,16 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Python and virtual environments
+venv/
+__pycache__/
+*.pyc
+
+# ML Data and Models
+runs/
+dataset_analysis/
+data/
